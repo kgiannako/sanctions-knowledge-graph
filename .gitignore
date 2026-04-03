@@ -1,0 +1,6 @@
+data/raw/
+data/faiss.index
+data/id_map.json
+__pycache__/
+*.pyc
+.env
