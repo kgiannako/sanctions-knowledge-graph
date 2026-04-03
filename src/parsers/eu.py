@@ -5,7 +5,7 @@ NS = "http://eu.europa.ec/fpi/fsd/export"
 
 TYPE_MAP = {
     "person": "Person",
-    "organisation": "Organisation",
+    "enterprise": "Organisation",
     "vessel": "Vessel"
 }
 
@@ -32,6 +32,10 @@ def parse_eu(path: str) -> tuple[list[Entity], list[Relationship]]:
             whole_name = alias.attrib.get("wholeName", "").strip()
             if not whole_name:
                 continue
+            lang = alias.attrib.get("nameLanguage", "").upper()
+            # only keep English or language-neutral aliases
+            if lang not in ("", "EN"):
+                continue
             if alias.attrib.get("strong") == "true" and not primary_name:
                 primary_name = whole_name
             else:
@@ -42,9 +46,11 @@ def parse_eu(path: str) -> tuple[list[Entity], list[Relationship]]:
             primary_name = aliases.pop(0)
 
         nationality = None
+        country = None
         citizenship = entry.find(tag("citizenship"))
         if citizenship is not None:
             nationality = citizenship.attrib.get("countryIso2Code") or citizenship.attrib.get("country")
+            country = nationality
 
         dob = None
         birthdate = entry.find(tag("birthdate"))
@@ -78,6 +84,11 @@ def parse_eu(path: str) -> tuple[list[Entity], list[Relationship]]:
             imo_number=imo,
             source="eu",
             raw_addresses=addresses,
+            country=country,
+            vessel_flag=None,
+            vessel_type=None,
+            vessel_owner=None,
+            tonnage=None,
         ))
 
     return entities, relationships

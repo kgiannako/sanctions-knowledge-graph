@@ -1,12 +1,6 @@
 import xml.etree.ElementTree as ET
 from src.models import Entity, Relationship
 
-TYPE_MAP = {
-    "individual": "Person",
-    "entity": "Organisation",
-    "vessel": "Vessel"
-}
-
 def parse_un(path: str) -> tuple[list[Entity], list[Relationship]]:
     tree = ET.parse(path)
     root = tree.getroot()
@@ -21,28 +15,25 @@ def parse_un(path: str) -> tuple[list[Entity], list[Relationship]]:
         primary_name = ' '.join(p for p in [first, second, third] if p)
 
         aliases = []
-        for aka in entry.findall('.//ALIAS'):
-            parts = [
-                aka.findtext('QUALITY'),
-                aka.findtext('ALIAS_NAME'),
-            ]
+        for aka in entry.findall('INDIVIDUAL_ALIAS'):
             alias = aka.findtext('ALIAS_NAME')
             if alias:
                 aliases.append(alias)
 
         nationality = entry.findtext('.//NATIONALITY/VALUE')
-        dob = entry.findtext('.//DATE_OF_BIRTH/VALUE')
+        dob = entry.findtext('.//INDIVIDUAL_DATE_OF_BIRTH/VALUE')
 
         addresses = []
-        for addr in entry.findall('.//ADDRESS'):
-            parts = [
-                addr.findtext('STREET'),
-                addr.findtext('CITY'),
-                addr.findtext('COUNTRY'),
-            ]
+        country = None
+        for addr in entry.findall('INDIVIDUAL_ADDRESS'):
+            country_val = addr.findtext('COUNTRY')
+            note = addr.findtext('NOTE')
+            parts = [country_val, note]
             address_str = ', '.join(p for p in parts if p)
             if address_str:
                 addresses.append(address_str)
+            if not country and country_val:
+                country = country_val
 
         entities.append(Entity(
             id=f"un_{uid}",
@@ -53,6 +44,7 @@ def parse_un(path: str) -> tuple[list[Entity], list[Relationship]]:
             dob=dob,
             source="un",
             raw_addresses=addresses,
+            country=country,
         ))
 
     for entry in root.findall('.//ENTITY'):
@@ -60,21 +52,22 @@ def parse_un(path: str) -> tuple[list[Entity], list[Relationship]]:
         primary_name = entry.findtext('FIRST_NAME') or ""
 
         aliases = []
-        for aka in entry.findall('.//ALIAS'):
+        for aka in entry.findall('ENTITY_ALIAS'):
             alias = aka.findtext('ALIAS_NAME')
             if alias:
                 aliases.append(alias)
 
         addresses = []
-        for addr in entry.findall('.//ADDRESS'):
-            parts = [
-                addr.findtext('STREET'),
-                addr.findtext('CITY'),
-                addr.findtext('COUNTRY'),
-            ]
+        country = None
+        for addr in entry.findall('ENTITY_ADDRESS'):
+            country_val = addr.findtext('COUNTRY')
+            state = addr.findtext('STATE_PROVINCE')
+            parts = [state, country_val]
             address_str = ', '.join(p for p in parts if p)
             if address_str:
                 addresses.append(address_str)
+            if not country and country_val:
+                country = country_val
 
         entities.append(Entity(
             id=f"un_{uid}",
@@ -83,6 +76,7 @@ def parse_un(path: str) -> tuple[list[Entity], list[Relationship]]:
             aliases=aliases,
             source="un",
             raw_addresses=addresses,
+            country=country,
         ))
 
     return entities, relationships

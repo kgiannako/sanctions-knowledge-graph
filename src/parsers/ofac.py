@@ -42,11 +42,14 @@ def parse_ofac(path: str) -> tuple[list[Entity], list[Relationship]]:
         ]
 
         addresses = []
+        country = None
         for addr in entry.findall(f".//{tag('address')}"):
             parts = [text(addr, "address1"), text(addr, "city"), text(addr, "country")]
             address_str = ', '.join(p for p in parts if p)
             if address_str:
                 addresses.append(address_str)
+            if not country:
+                country = text(addr, "country")
 
         nationality = None
         for nat in entry.findall(f".//{tag('nationality')}"):
@@ -58,11 +61,26 @@ def parse_ofac(path: str) -> tuple[list[Entity], list[Relationship]]:
             dob = text(dob_item, "dateOfBirth")
             break
 
+        # fixed IMO extraction
         imo = None
         for id_el in entry.findall(f".//{tag('id')}"):
-            if text(id_el, "idType") == "IMO Number":
-                imo = text(id_el, "idNumber")
+            id_type = text(id_el, "idType") or ""
+            id_number = text(id_el, "idNumber") or ""
+            if "IMO" in id_number.upper() or "vessel registration" in id_type.lower():
+                imo = id_number.replace("IMO ", "").strip()
                 break
+
+        # vessel specific fields
+        vessel_flag = None
+        vessel_type = None
+        vessel_owner = None
+        tonnage = None
+        vessel_info = entry.find(tag("vesselInfo"))
+        if vessel_info is not None:
+            vessel_flag = text(vessel_info, "vesselFlag")
+            vessel_type = text(vessel_info, "vesselType")
+            vessel_owner = text(vessel_info, "vesselOwner")
+            tonnage = text(vessel_info, "grossRegisteredTonnage")
 
         entity = Entity(
             id=f"ofac_{uid}",
@@ -75,6 +93,11 @@ def parse_ofac(path: str) -> tuple[list[Entity], list[Relationship]]:
             source="ofac",
             programs=programs,
             raw_addresses=addresses,
+            country=country,
+            vessel_flag=vessel_flag,
+            vessel_type=vessel_type,
+            vessel_owner=vessel_owner,
+            tonnage=tonnage,
         )
         entities.append(entity)
 

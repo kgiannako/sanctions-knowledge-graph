@@ -27,7 +27,12 @@ def load_entities(driver, entities: list[Entity]):
                     n.imo_number = $imo_number,
                     n.source = $source,
                     n.programs = $programs,
-                    n.addresses = $addresses
+                    n.addresses = $addresses,
+                    n.country = $country,
+                    n.vessel_flag = $vessel_flag,
+                    n.vessel_type = $vessel_type,
+                    n.vessel_owner = $vessel_owner,
+                    n.tonnage = $tonnage
             """,
                 id=e.id,
                 type=e.entity_type,
@@ -39,6 +44,11 @@ def load_entities(driver, entities: list[Entity]):
                 source=e.source,
                 programs=e.programs,
                 addresses=e.raw_addresses,
+                country=e.country,
+                vessel_flag=e.vessel_flag,
+                vessel_type=e.vessel_type,
+                vessel_owner=e.vessel_owner,
+                tonnage=e.tonnage,
             )
 
 def load_relationships(driver, relationships: list[Relationship]):

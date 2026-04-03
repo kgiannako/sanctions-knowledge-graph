@@ -13,10 +13,15 @@ class Entity:
     source: str = ""
     programs: list[str] = field(default_factory=list)
     raw_addresses: list[str] = field(default_factory=list)
+    country: Optional[str] = None          # structured country field
+    vessel_flag: Optional[str] = None      # vessels
+    vessel_type: Optional[str] = None      # vessels
+    vessel_owner: Optional[str] = None     # vessels
+    tonnage: Optional[str] = None          # vessels
 
 @dataclass
 class Relationship:
     source_id: str
     target_id: str
-    rel_type: str                  # OWNS | CONTROLS | ASSOCIATED_WITH | LISTED_BY
+    rel_type: str
     attributes: dict = field(default_factory=dict)

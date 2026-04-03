@@ -23,3 +23,8 @@ print(f"\nSample EU entity: {eu_entities[0]}")
 
 total = len(ofac_entities) + len(un_entities) + len(eu_entities)
 print(f"\nTotal entities across all sources: {total}")
+
+vessels = [e for e in ofac_entities if e.entity_type == "Vessel"]
+with_imo = [e for e in vessels if e.imo_number]
+print(f"\nOFAC vessels with IMO: {len(with_imo)} / {len(vessels)}")
+print(f"Sample vessel: {with_imo[0] if with_imo else 'none'}")
