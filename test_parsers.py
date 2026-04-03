@@ -28,3 +28,17 @@ vessels = [e for e in ofac_entities if e.entity_type == "Vessel"]
 with_imo = [e for e in vessels if e.imo_number]
 print(f"\nOFAC vessels with IMO: {len(with_imo)} / {len(vessels)}")
 print(f"Sample vessel: {with_imo[0] if with_imo else 'none'}")
+
+vessels = [e for e in ofac_entities if e.entity_type == "Vessel"]
+with_callsign = [e for e in vessels if e.call_sign]
+with_mmsi = [e for e in vessels if e.mmsi]
+with_un_ref = [e for e in ofac_entities if e.un_ref_id]
+
+print(f"\nOFAC vessels with call sign: {len(with_callsign)} / {len(vessels)}")
+print(f"OFAC vessels with MMSI: {len(with_mmsi)} / {len(vessels)}")
+print(f"OFAC entities with UN ref ID: {len(with_un_ref)}")
+
+if with_callsign:
+    print(f"Sample call sign: {with_callsign[0].primary_name} — {with_callsign[0].call_sign}")
+if with_mmsi:
+    print(f"Sample MMSI: {with_mmsi[0].primary_name} — {with_mmsi[0].mmsi}")

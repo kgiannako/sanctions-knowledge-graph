@@ -13,11 +13,14 @@ class Entity:
     source: str = ""
     programs: list[str] = field(default_factory=list)
     raw_addresses: list[str] = field(default_factory=list)
-    country: Optional[str] = None          # structured country field
-    vessel_flag: Optional[str] = None      # vessels
-    vessel_type: Optional[str] = None      # vessels
-    vessel_owner: Optional[str] = None     # vessels
-    tonnage: Optional[str] = None          # vessels
+    country: Optional[str] = None
+    vessel_flag: Optional[str] = None
+    vessel_type: Optional[str] = None
+    vessel_owner: Optional[str] = None
+    tonnage: Optional[str] = None
+    call_sign: Optional[str] = None
+    mmsi: Optional[str] = None
+    un_ref_id: Optional[str] = None
 
 @dataclass
 class Relationship:

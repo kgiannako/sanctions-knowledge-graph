@@ -76,6 +76,7 @@ def parse_eu(path: str) -> tuple[list[Entity], list[Relationship]]:
 
         entities.append(Entity(
             id=f"eu_{uid}",
+            un_ref_id=un_id,
             entity_type=TYPE_MAP.get(etype.lower(), "Organisation"),
             primary_name=primary_name,
             aliases=aliases,

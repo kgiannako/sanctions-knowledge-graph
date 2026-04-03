@@ -61,26 +61,35 @@ def parse_ofac(path: str) -> tuple[list[Entity], list[Relationship]]:
             dob = text(dob_item, "dateOfBirth")
             break
 
-        # fixed IMO extraction
+        # ID list — IMO, MMSI, UN ref
         imo = None
+        mmsi = None
+        un_ref_id = None
         for id_el in entry.findall(f".//{tag('id')}"):
             id_type = text(id_el, "idType") or ""
             id_number = text(id_el, "idNumber") or ""
-            if "IMO" in id_number.upper() or "vessel registration" in id_type.lower():
+            id_type_lower = id_type.lower()
+
+            if "imo" in id_number.upper() or "vessel registration" in id_type_lower:
                 imo = id_number.replace("IMO ", "").strip()
-                break
+            elif "mmsi" in id_type_lower:
+                mmsi = id_number.strip()
+            elif "un" in id_type_lower and "number" in id_type_lower:
+                un_ref_id = id_number.strip()
 
         # vessel specific fields
         vessel_flag = None
         vessel_type = None
         vessel_owner = None
         tonnage = None
+        call_sign = None
         vessel_info = entry.find(tag("vesselInfo"))
         if vessel_info is not None:
             vessel_flag = text(vessel_info, "vesselFlag")
             vessel_type = text(vessel_info, "vesselType")
             vessel_owner = text(vessel_info, "vesselOwner")
             tonnage = text(vessel_info, "grossRegisteredTonnage")
+            call_sign = text(vessel_info, "callSign")
 
         entity = Entity(
             id=f"ofac_{uid}",
@@ -98,6 +107,9 @@ def parse_ofac(path: str) -> tuple[list[Entity], list[Relationship]]:
             vessel_type=vessel_type,
             vessel_owner=vessel_owner,
             tonnage=tonnage,
+            call_sign=call_sign,
+            mmsi=mmsi,
+            un_ref_id=un_ref_id,
         )
         entities.append(entity)
 

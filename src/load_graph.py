@@ -32,7 +32,10 @@ def load_entities(driver, entities: list[Entity]):
                     n.vessel_flag = $vessel_flag,
                     n.vessel_type = $vessel_type,
                     n.vessel_owner = $vessel_owner,
-                    n.tonnage = $tonnage
+                    n.tonnage = $tonnage,
+                    n.call_sign = $call_sign,
+                    n.mmsi = $mmsi,
+                    n.un_ref_id = $un_ref_id
             """,
                 id=e.id,
                 type=e.entity_type,
@@ -49,6 +52,9 @@ def load_entities(driver, entities: list[Entity]):
                 vessel_type=e.vessel_type,
                 vessel_owner=e.vessel_owner,
                 tonnage=e.tonnage,
+                call_sign=e.call_sign,
+                mmsi=e.mmsi,
+                un_ref_id=e.un_ref_id,
             )
 
 def load_relationships(driver, relationships: list[Relationship]):
