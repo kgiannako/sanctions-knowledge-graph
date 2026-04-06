@@ -9,11 +9,20 @@ This project builds a Knowledge Base over public sanctions data from three juris
 The architecture supports AI agent queries requiring multi-hop reasoning: for example, determining whether a vessel is ultimately controlled by a sanctioned individual through a chain of ownership relationships.
 
 ## Architecture
-## Architecture
+
+The pipeline has six layers, each with a single responsibility:
 
 ![Architecture diagram](docs/architecture.png)
 
+Data from three public XML sources is parsed into a canonical entity model, loaded into Neo4j as a property graph, and simultaneously embedded into a FAISS vector index. The entity resolution layer combines semantic similarity search with structured attribute scoring to draw `SAME_AS` edges between cross-source matches. The LangGraph agent sits on top, using both the graph and the vector index as tools to answer multi-hop queries.
+
+## Knowledge graph
+
+The Neo4j graph below shows `SAME_AS` relationships between entities resolved across OFAC, UN, and EU sanctions lists. Each node is a sanctioned entity — person, organisation, or vessel — and each edge represents a confirmed cross-source match with a combined confidence score stored as an edge property.
+
 ![Neo4j SAME_AS network](docs/neo4j_same_as_network.png)
+
+Entities sharing the same real-world identity but listed under different names or transliterations across jurisdictions are linked at ingestion time, enabling the agent to consolidate information across sources in a single query.
 
 ## Data Sources
 
