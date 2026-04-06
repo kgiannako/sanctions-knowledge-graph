@@ -1,0 +1,95 @@
+{
+  "total": 5,
+  "passed": 5,
+  "failed": 0,
+  "pass_rate": 1.0,
+  "timestamp": "2026-04-06T16:07:59.493140",
+  "results": [
+    {
+      "id": "eval_001",
+      "query": "Is the vessel EBANO sanctioned?",
+      "answer": "**Yes, the vessel EBANO is sanctioned.**\n\nHere are the key details:\n\n- **Vessel Name**: EBANO\n- **Sanctions Program**: CUBA (Cuban sanctions program)\n- **Source**: OFAC (Office of Foreign Assets Control)\n- **IMO Number**: 7406784\n- **Flag State**: Panama\n- **Vessel Type**: General Cargo\n- **Known Aliases**: ANA I, SAND SWAN\n\nThe vessel EBANO is sanctioned under the Cuban sanctions program by OFAC. This means that U.S. persons are generally prohibited from engaging in transactions with this vessel, and it may be subject to asset freezing and other sanctions measures.",
+      "scores": {
+        "keyword_hit_rate": 1.0,
+        "keyword_hits": [
+          "sanctioned",
+          "CUBA",
+          "Panama",
+          "cargo"
+        ],
+        "keyword_misses": [],
+        "entity_found": true,
+        "pass": true
+      },
+      "timestamp": "2026-04-06T16:07:17.846870"
+    },
+    {
+      "id": "eval_002",
+      "query": "What sanctions programs is Al Qaeda listed under?",
+      "answer": "Based on the search results, Al Qaeda is listed under the following sanctions programs:\n\n**US OFAC Programs:**\n- **FTO** (Foreign Terrorist Organizations)\n- **SDGT** (Specially Designated Global Terrorists)\n\n**Other Jurisdictions:**\n- **UN Sanctions** - Listed on the UN Consolidated List\n- **EU Sanctions** - Listed on the EU Consolidated List\n\nAl Qaeda appears across multiple sanctions lists with various aliases including \"The Base,\" \"Islamic Salvation Foundation,\" \"Usama Bin Laden Network,\" and many others. The organization is sanctioned by major jurisdictions including the United States (under both FTO and SDGT programs), the United Nations, and the European Union, reflecting the international consensus on its designation as a terrorist organization.",
+      "scores": {
+        "keyword_hit_rate": 1.0,
+        "keyword_hits": [
+          "SDGT",
+          "FTO",
+          "terrorist",
+          "multiple"
+        ],
+        "keyword_misses": [],
+        "entity_found": true,
+        "pass": true
+      },
+      "timestamp": "2026-04-06T16:07:33.929202"
+    },
+    {
+      "id": "eval_003",
+      "query": "What is Osama Bin Laden's date of birth and nationality?",
+      "answer": "Based on the sanctions database information for Osama Bin Laden:\n\n**Date of Birth:** July 30, 1957\n\n**Nationality:** The nationality field is listed as null in the sanctions database, meaning this information is not specified in the available sanctions records.\n\nThe database shows his full name as \"Usama bin Muhammad bin Awad BIN LADIN\" and includes numerous aliases. He is listed under the SDGT (Specially Designated Global Terrorist) sanctions program. While his date of birth is clearly documented, the nationality information is not provided in the sanctions database records.",
+      "scores": {
+        "keyword_hit_rate": 1.0,
+        "keyword_hits": [
+          "1957",
+          "SDGT"
+        ],
+        "keyword_misses": [],
+        "entity_found": true,
+        "pass": true
+      },
+      "timestamp": "2026-04-06T16:07:42.612188"
+    },
+    {
+      "id": "eval_004",
+      "query": "How many vessels are sanctioned under the Iran program?",
+      "answer": "There are **547 vessels** sanctioned under the Iran program. These vessels are sanctioned under various Iran-related sanctions programs including:\n\n- IRAN (general Iran sanctions)\n- IRAN-EO13902 (specific Executive Order)\n- NPWMD (Non-Proliferation of Weapons of Mass Destruction)\n- IFSR (Iran Freedom and Support Act)\n\nThe sample shows vessels with names like AAJ, ABBA, ABHRA, ABTIN 1, ABYAN, ACE, ADA, ADELINE G, ADENA, and AEOLUS, among others. Many of these vessels are subject to multiple overlapping Iran-related sanctions programs.",
+      "scores": {
+        "keyword_hit_rate": 1.0,
+        "keyword_hits": [
+          "547",
+          "vessel",
+          "Iran"
+        ],
+        "keyword_misses": [],
+        "entity_found": true,
+        "pass": true
+      },
+      "timestamp": "2026-04-06T16:07:48.145250"
+    },
+    {
+      "id": "eval_005",
+      "query": "Is there a sanctioned entity called Hamas and which lists does it appear on?",
+      "answer": "Yes, Hamas is a sanctioned entity that appears on multiple sanctions lists:\n\n**Hamas** (also known as the Islamic Resistance Movement) is sanctioned by:\n\n1. **EU sanctions list** - Listed as \"Hamas\"\n2. **OFAC (US Treasury)** - Listed as \"HAMAS\"\n\nThe entity appears under the following **sanctions programs**:\n- **FTO** (Foreign Terrorist Organizations)\n- **SDGT** (Specially Designated Global Terrorists)\n\n**Key aliases include:**\n- Islamic Resistance Movement\n- Harakat al-Muqawama al-Islamiya\n- Students of Ayyash\n- Students of the Engineer\n- Yahya Ayyash Units\n- Izz al-Din al-Qassim/Qassam Brigades/Forces/Battalions\n- Hamas-Izz al-Din al-Qassem\n\nThe EU and OFAC entries are linked as the same entity, indicating this is a coordinated international sanctions designation targeting the same organization across both US and European sanctions regimes.",
+      "scores": {
+        "keyword_hit_rate": 1.0,
+        "keyword_hits": [
+          "Hamas",
+          "sanctioned",
+          "SDGT"
+        ],
+        "keyword_misses": [],
+        "entity_found": true,
+        "pass": true
+      },
+      "timestamp": "2026-04-06T16:07:59.493140"
+    }
+  ]
+}
