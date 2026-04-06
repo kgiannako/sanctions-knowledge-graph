@@ -11,6 +11,20 @@ _model = None
 _index = None
 _id_map = None
 
+STRIP_TERMS = {
+    'bank', 'ltd', 'llc', 'plc', 'inc', 'corp', 'corporation',
+    'company', 'co', 'group', 'holding', 'holdings', 'international',
+    'trading', 'import', 'export', 'islamic', 'national', 'general',
+    'the', 'of', 'and', 'for', 'al', 'el'
+}
+
+def normalise_org_name(name: str) -> str:
+    if not name:
+        return name
+    tokens = name.lower().split()
+    filtered = [t for t in tokens if t.strip('.,') not in STRIP_TERMS]
+    return ' '.join(filtered) if filtered else name.lower()
+
 def _load():
     global _model, _index, _id_map
     if _model is None:
@@ -35,7 +49,6 @@ def semantic_search(
     query_vec = _model.encode([query], normalize_embeddings=True)
     query_vec = np.array(query_vec).astype("float32")
 
-    # search more than top_k to allow for filtering
     search_k = min(top_k * 10, len(_id_map))
     scores, indices = _index.search(query_vec, search_k)
 
@@ -47,15 +60,12 @@ def semantic_search(
             continue
         entry = _id_map[idx]
 
-        # filter by entity type if specified
         if entity_type and entry["type"] != entity_type:
             continue
 
-        # filter by source if specified
         if exclude_source and entry["source"] == exclude_source:
             continue
 
-        # deduplicate — keep highest scoring match per entity
         if entry["id"] in seen_ids:
             continue
         seen_ids.add(entry["id"])
@@ -76,7 +86,6 @@ def semantic_search(
 
 
 if __name__ == "__main__":
-    # quick test
     queries = [
         ("Bin Laden", "Person"),
         ("Al Qaeda", "Organisation"),
