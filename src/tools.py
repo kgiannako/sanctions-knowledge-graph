@@ -127,6 +127,73 @@ def get_consolidated_profile(entity_id: str) -> dict:
         "relationships": profile.get("relationships", []),
     }
 
+def find_entities_by_program(program: str, entity_type: str = None) -> list[dict]:
+    """
+    Find all entities listed under a specific sanctions program.
+    program examples: 'IRAN', 'SDGT', 'UKRAINE', 'DPRK', 'CUBA'
+    entity_type can be 'Person', 'Organisation', or 'Vessel' — leave None for all.
+    """
+    driver = get_driver()
+    with driver.session() as session:
+        if entity_type:
+            result = session.run("""
+                MATCH (n:Entity)
+                WHERE any(p IN n.programs WHERE toUpper(p) CONTAINS toUpper($program))
+                AND n.type = $type
+                RETURN n.id AS id, n.name AS name, n.type AS type,
+                       n.source AS source, n.programs AS programs
+                ORDER BY n.name
+            """, program=program, type=entity_type)
+        else:
+            result = session.run("""
+                MATCH (n:Entity)
+                WHERE any(p IN n.programs WHERE toUpper(p) CONTAINS toUpper($program))
+                RETURN n.id AS id, n.name AS name, n.type AS type,
+                       n.source AS source, n.programs AS programs
+                ORDER BY n.type, n.name
+            """, program=program)
+
+        entities = [dict(r) for r in result]
+    driver.close()
+    return entities
+
+
+def find_entities_by_country(country: str, entity_type: str = None) -> list[dict]:
+    """
+    Find all entities associated with a specific country.
+    Searches nationality, country, and vessel_flag fields.
+    """
+    driver = get_driver()
+    with driver.session() as session:
+        if entity_type:
+            result = session.run("""
+                MATCH (n:Entity)
+                WHERE (toUpper(n.nationality) CONTAINS toUpper($country)
+                    OR toUpper(n.country) CONTAINS toUpper($country)
+                    OR toUpper(n.vessel_flag) CONTAINS toUpper($country))
+                AND n.type = $type
+                RETURN n.id AS id, n.name AS name, n.type AS type,
+                       n.source AS source, n.nationality AS nationality,
+                       n.country AS country, n.vessel_flag AS vessel_flag
+                ORDER BY n.name
+                LIMIT 50
+            """, country=country, type=entity_type)
+        else:
+            result = session.run("""
+                MATCH (n:Entity)
+                WHERE toUpper(n.nationality) CONTAINS toUpper($country)
+                    OR toUpper(n.country) CONTAINS toUpper($country)
+                    OR toUpper(n.vessel_flag) CONTAINS toUpper($country)
+                RETURN n.id AS id, n.name AS name, n.type AS type,
+                       n.source AS source, n.nationality AS nationality,
+                       n.country AS country, n.vessel_flag AS vessel_flag
+                ORDER BY n.type, n.name
+                LIMIT 50
+            """, country=country)
+
+        entities = [dict(r) for r in result]
+    driver.close()
+    return entities
 
 if __name__ == "__main__":
     print("--- Test: search for Bin Laden ---")

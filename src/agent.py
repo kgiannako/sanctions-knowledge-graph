@@ -65,7 +65,53 @@ def get_linked_entities(entity_id: str) -> str:
     }
     return json.dumps(output, indent=2, default=str)
 
+@tool
+def find_by_sanctions_program(program: str, entity_type: str = None) -> str:
+    """
+    Find all sanctioned entities under a specific sanctions program.
+    Use program codes like 'IRAN', 'SDGT', 'UKRAINE', 'DPRK', 'CUBA', 'RUSSIA'.
+    entity_type can be 'Person', 'Organisation', or 'Vessel' — leave empty for all types.
+    Useful for finding all vessels, people, or organisations under a specific regime.
+    """
+    from src.tools import find_entities_by_program
+    results = find_entities_by_program(program=program, entity_type=entity_type)
+    if not results:
+        return f"No entities found under program: {program}"
+    # summarise to avoid overwhelming the agent
+    summary = {
+        "program": program,
+        "total": len(results),
+        "by_type": {},
+        "sample": results[:10]
+    }
+    for r in results:
+        t = r["type"]
+        summary["by_type"][t] = summary["by_type"].get(t, 0) + 1
+    return json.dumps(summary, indent=2, default=str)
 
+
+@tool
+def find_by_country(country: str, entity_type: str = None) -> str:
+    """
+    Find all sanctioned entities associated with a specific country.
+    Searches across nationality, country of registration, and vessel flag state.
+    entity_type can be 'Person', 'Organisation', or 'Vessel' — leave empty for all types.
+    Useful for country-level exposure analysis.
+    """
+    from src.tools import find_entities_by_country
+    results = find_entities_by_country(country=country, entity_type=entity_type)
+    if not results:
+        return f"No entities found for country: {country}"
+    summary = {
+        "country": country,
+        "total": len(results),
+        "by_type": {},
+        "sample": results[:10]
+    }
+    for r in results:
+        t = r["type"]
+        summary["by_type"][t] = summary["by_type"].get(t, 0) + 1
+    return json.dumps(summary, indent=2, default=str)
 # --- Agent setup ---
 
 def build_agent():
@@ -79,6 +125,8 @@ def build_agent():
         search_sanctions_entities,
         get_entity_profile,
         get_linked_entities,
+        find_by_sanctions_program,
+        find_by_country,
     ]
 
     agent = create_react_agent(model, tools)
@@ -157,6 +205,8 @@ if __name__ == "__main__":
         "What do you know about Bin Laden across all sanctions lists?",
         "Is the vessel EBANO sanctioned and what do we know about it?",
         "Tell me about Al Qaeda and which sanctions programs it appears in.",
+        "How many vessels are sanctioned under the Iran program and can you tell me about a few of them?",
+        "Are there any North Korean entities sanctioned across multiple lists?",
     ]
 
     for query in queries:
