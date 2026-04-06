@@ -9,15 +9,11 @@ This project builds a Knowledge Base over public sanctions data from three juris
 The architecture supports AI agent queries requiring multi-hop reasoning: for example, determining whether a vessel is ultimately controlled by a sanctioned individual through a chain of ownership relationships.
 
 ## Architecture
+## Architecture
 
-```
-OFAC SDN (XML) ──┐
-UN List (XML)  ──┼──► Parsers ──► Canonical Entity Model ──► Neo4j Graph
-EU List (XML)  ──┘                                        ──► FAISS Semantic Index
-                                                          ──► Attribute Scorer
-                                                          ──► SAME_AS Edge Resolution
-                                                          ──► LangGraph Agent (Day 3)
-```
+![Architecture diagram](docs/architecture.png)
+
+![Neo4j SAME_AS network](docs/neo4j_same_as_network.png)
 
 ## Data Sources
 
