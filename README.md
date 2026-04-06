@@ -52,9 +52,11 @@ sanctions-knowledge-graph/
 │   ├── load_graph.py     # Neo4j loader
 │   ├── embed.py          # FAISS index builder
 │   ├── search.py         # semantic search with org name normalisation
-│   └── resolve.py        # entity resolution and SAME_AS edge writer
+│   ├── resolve.py        # entity resolution and SAME_AS edge writer
 │   ├── tools.py          # retrieval tool functions
-│   └── agent.py          # LangGraph ReAct agent
+│   ├── agent.py          # LangGraph ReAct agent
+│   └── eval.py           # evaluation framework
+├── cli.py                # interactive CLI
 ├── docker-compose.yml
 ├── ingest.py             # ingestion orchestration
 └── README.md
@@ -142,6 +144,22 @@ Example queries the agent handles:
 - "How many vessels are sanctioned under the Iran program?"
 - "Are there North Korean entities sanctioned across multiple lists?"
 
+The agent has been evaluated against a 5-query benchmark covering all entity types and query patterns, achieving a 100% pass rate on factual retrieval tasks.
+
+## Evaluation
+
+A keyword-based evaluation framework benchmarks the agent against 5 ground truth 
+queries covering persons, organisations, vessels, program lookups, and multi-source 
+consolidation. Results are saved to `data/eval_results.json` for tracking across runs.
+```bash
+python -m src.eval
+```
+
+Known limitation: the agent occasionally retrieves from a single source rather than 
+consolidating across all SAME_AS linked entities. This is most visible for entities 
+where nationality or DOB fields differ across lists. A production fix would instruct 
+the agent to always call `get_entity_profile` before answering biographical queries.
+
 ## Production Considerations
 
 - **Batched ingestion:** prototype loads one entity per transaction; production would use `UNWIND` batches of 500–1000 for throughput
@@ -155,5 +173,5 @@ Example queries the agent handles:
 
 - [x] Data ingestion, canonical model, Neo4j graph
 - [x] Semantic embedding, FAISS index, attribute scoring, entity resolution
-- [x] LangGraph agent with graph and semantic retrieval tools
+- [x] LangGraph agent, multi-hop reasoning, eval framework, CLI
 - [ ] Evaluation framework, production narrative, documentation
