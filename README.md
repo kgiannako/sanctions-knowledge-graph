@@ -35,7 +35,7 @@ All sources are publicly available and updated regularly by their respective aut
 - **Python 3.11** — parsing, normalisation, graph loading
 - **Docker** — containerised Neo4j instance
 - **sentence-transformers + FAISS** — semantic alias embedding and retrieval
-- **LangGraph** — agentic multi-hop query layer *(Day 3)*
+- **LangGraph + Claude Sonnet** — ReAct agent with multi-hop reasoning
 
 ## Project Structure
 
@@ -53,6 +53,8 @@ sanctions-knowledge-graph/
 │   ├── embed.py          # FAISS index builder
 │   ├── search.py         # semantic search with org name normalisation
 │   └── resolve.py        # entity resolution and SAME_AS edge writer
+│   ├── tools.py          # retrieval tool functions
+│   └── agent.py          # LangGraph ReAct agent
 ├── docker-compose.yml
 ├── ingest.py             # ingestion orchestration
 └── README.md
@@ -123,6 +125,23 @@ Across 25,568 entities and 24,378 evaluated pairs, the pipeline produced 4,076 S
 
 Pairs with no attribute evidence require a higher semantic threshold (0.95 for organisations, 0.90 for persons) to guard against common-name false positives. Confirmed matches are written as `SAME_AS` edges in Neo4j, storing semantic score, attribute score, combined score, and the evidence reasons on each edge for auditability.
 
+## Agent
+
+A LangGraph ReAct agent wraps the knowledge base into a conversational interface. The agent has five tools:
+
+- `search_sanctions_entities` — semantic name search across all entities
+- `get_entity_profile` — consolidated profile merging SAME_AS links across sources
+- `get_linked_entities` — graph traversal for ownership and association chains
+- `find_by_sanctions_program` — retrieve all entities under a specific program (IRAN, DPRK, SDGT etc)
+- `find_by_country` — retrieve entities by nationality, country, or vessel flag state
+
+The agent selects tools autonomously, chains calls for multi-hop queries, and synthesises results across sources into a single answer. All runs are logged to `data/agent_traces.jsonl` for auditability.
+
+Example queries the agent handles:
+- "What do we know about Bin Laden across all sanctions lists?"
+- "How many vessels are sanctioned under the Iran program?"
+- "Are there North Korean entities sanctioned across multiple lists?"
+
 ## Production Considerations
 
 - **Batched ingestion:** prototype loads one entity per transaction; production would use `UNWIND` batches of 500–1000 for throughput
@@ -130,10 +149,11 @@ Pairs with no attribute evidence require a higher semantic threshold (0.95 for o
 - **Incremental indexing:** currently re-embeds all entities from scratch; production would embed only new or changed entities
 - **Vector database:** flat FAISS files work at this scale; production would use a managed vector store (Pinecone, pgvector) for concurrent access and upserts
 - **Jurisdiction-agnostic schema:** adding a new sanctions list requires only a new parser module with no downstream changes
+- **Resolution threshold tuning:** well-known organisations appearing across all three lists (e.g. KOMID, Reconnaissance General Bureau) were not linked via SAME_AS edges due to conservative combined score thresholds. The agent's semantic search correctly identifies these cross-list matches at query time, but pre-computed SAME_AS edges would make traversal more efficient at scale. Threshold calibration against a labelled ground truth set is the recommended next step.
 
 ## Status
 
 - [x] Data ingestion, canonical model, Neo4j graph
 - [x] Semantic embedding, FAISS index, attribute scoring, entity resolution
-- [ ] LangGraph agent with graph and semantic retrieval tools
+- [x] LangGraph agent with graph and semantic retrieval tools
 - [ ] Evaluation framework, production narrative, documentation
